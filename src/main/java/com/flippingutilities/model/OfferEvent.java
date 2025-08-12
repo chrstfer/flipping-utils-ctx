@@ -171,6 +171,9 @@ public class OfferEvent
 	 * sell that item (currentQuantityInTrade of 1), to figure out the optimal buying and selling prices.
 	 *
 	 * @return boolean value representing whether the offer is a margin check or not
+     *
+     * TODO / Question: is this really a good definition of a margin check? To me a margin check is a Flip of qty 1 where the buy is above the sell and within a short time...
+     *
 	 */
 	public boolean isMarginCheck()
 	{
@@ -224,6 +227,7 @@ public class OfferEvent
 		);
 	}
 
+    // TODO / Question : shouldnt we be checking the rest of the fields?
 	public boolean equals(Object other)
 	{
 		if (other == this)
@@ -246,7 +250,36 @@ public class OfferEvent
 			&& time.equals(otherOffer.time);
 	}
 
-	/**
+    /**
+     * This checks whether the given OfferEvent is equivalent to this OfferEvent, meaning all fields but the UUID are equal.
+     *
+     * TODO / Question: should this and isDuplicate be swapped? Terminology would fit better. Duplicates are redundant, but equivalents could just be two orders playing the same range trade.
+     *
+     * @param other the OfferEvent being compared.
+     * @return whether or not the given offer event is equivalent to this one.
+     */
+    public boolean isEquivalent(Object other)
+    {
+        if (!(other instanceof OfferEvent))
+        {
+            return false;
+        } else if (other == this)
+        {
+            return true;
+        } else {
+
+            OfferEvent otherOffer = (OfferEvent) other;
+
+            return
+                    isDuplicate(otherOffer)
+                            // && !(uuid.equals(otherOffer.uuid)) // should we enforce non-equivalence or just leave it undefined so X.isEquivalent(X) == true?
+                            && tickArrivedAt == otherOffer.tickArrivedAt
+                            && ticksSinceFirstOffer == otherOffer.ticksSinceFirstOffer
+                            && time.equals(otherOffer.time);
+        }
+    }
+
+    /**
 	 * This checks whether the given OfferEvent is a "duplicate" of this OfferEvent. Some fields such as
 	 * tickArrivedAt are omitted because even if they are different, the given offer is still redundant due to all
 	 * the other information being the same and should be screened out by screenOfferEvent in FlippingPlugin, where
@@ -260,7 +293,8 @@ public class OfferEvent
 		return state == other.getState()
 			&& currentQuantityInTrade == other.getCurrentQuantityInTrade()
 			&& slot == other.getSlot()
-			&& totalQuantityInTrade == other.getTotalQuantityInTrade() && itemId == other.getItemId()
+			&& totalQuantityInTrade == other.getTotalQuantityInTrade()
+            && itemId == other.getItemId()
 			&& getPrice() == other.getPrice();
 	}
 

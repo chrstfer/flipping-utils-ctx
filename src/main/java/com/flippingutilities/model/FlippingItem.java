@@ -82,8 +82,19 @@ public class FlippingItem implements Searchable
 	//whether the item should be on the flipping panel or not.
 	@SerializedName("vFPI")
 	@Getter
-	@Setter
+	//@Setter
 	private Boolean validFlippingPanelItem;
+    public void setValidFlippingPanelItem(boolean isValid)
+    {
+        validFlippingPanelItem = isValid;
+        if (!isValid)
+        {
+            latestInstaBuy = Optional.empty();
+            latestInstaSell = Optional.empty();
+            latestBuy = Optional.empty();
+            latestSell = Optional.empty();
+        }
+    }
 
 	@Getter
 	@Setter
@@ -293,17 +304,6 @@ public class FlippingItem implements Searchable
 	{
 		history.deleteOffers(offerList);
 	}
-	public void setValidFlippingPanelItem(boolean isValid)
-	{
-		validFlippingPanelItem = isValid;
-		if (!isValid)
-		{
-			latestInstaBuy = Optional.empty();
-			latestInstaSell = Optional.empty();
-			latestBuy = Optional.empty();
-			latestSell = Optional.empty();
-		}
-	}
 
 	public Optional<Integer> getPotentialProfit(boolean includeMarginCheck, boolean shouldUseRemainingGeLimit)
 	{
@@ -348,7 +348,7 @@ public class FlippingItem implements Searchable
 		latestSell = history.getLatestOfferThatMatchesPredicate(offer -> !offer.isBuy());
 		latestInstaBuy = history.getLatestOfferThatMatchesPredicate(offer -> offer.isBuy() & offer.isMarginCheck());
 		latestInstaSell = history.getLatestOfferThatMatchesPredicate(offer -> !offer.isBuy() & offer.isMarginCheck());
-		latestActivityTime = history.getCompressedOfferEvents().size() == 0? Instant.EPOCH : history.getCompressedOfferEvents().get(history.getCompressedOfferEvents().size()-1).getTime();
+		latestActivityTime = history.getCompressedOfferEvents().isEmpty() ? Instant.EPOCH : history.getCompressedOfferEvents().get(history.getCompressedOfferEvents().size()-1).getTime();
 	}
 
 	private void setOfferMadeBy() {

@@ -108,9 +108,12 @@ public class FlippingPlugin extends Plugin {
     @Inject
     @Getter
     private ScheduledExecutorService executor;
+
     private ScheduledFuture generalRepeatingTasks;
+
     @Inject
     private ClientToolbar clientToolbar;
+
     private NavigationButton navButton;
 
     @Inject
@@ -185,7 +188,7 @@ public class FlippingPlugin extends Plugin {
     private SlotSenderJob slotStateSenderJob;
 
     private ScheduledFuture slotTimersTask;
-    private Instant startUpTime = Instant.now();
+    private final Instant startUpTime = Instant.now();
 
     @Getter
     private int loginTickCount;
