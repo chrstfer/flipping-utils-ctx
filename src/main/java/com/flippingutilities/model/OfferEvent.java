@@ -246,7 +246,7 @@ public class OfferEvent
 			&& time.equals(otherOffer.time);
 	}
 
-	/**
+    /**
 	 * This checks whether the given OfferEvent is a "duplicate" of this OfferEvent. Some fields such as
 	 * tickArrivedAt are omitted because even if they are different, the given offer is still redundant due to all
 	 * the other information being the same and should be screened out by screenOfferEvent in FlippingPlugin, where
@@ -260,7 +260,8 @@ public class OfferEvent
 		return state == other.getState()
 			&& currentQuantityInTrade == other.getCurrentQuantityInTrade()
 			&& slot == other.getSlot()
-			&& totalQuantityInTrade == other.getTotalQuantityInTrade() && itemId == other.getItemId()
+			&& totalQuantityInTrade == other.getTotalQuantityInTrade()
+            && itemId == other.getItemId()
 			&& getPrice() == other.getPrice();
 	}
 

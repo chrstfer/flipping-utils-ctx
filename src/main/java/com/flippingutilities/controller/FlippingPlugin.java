@@ -185,7 +185,7 @@ public class FlippingPlugin extends Plugin {
     private SlotSenderJob slotStateSenderJob;
 
     private ScheduledFuture slotTimersTask;
-    private Instant startUpTime = Instant.now();
+    private final Instant startUpTime = Instant.now();
 
     @Getter
     private int loginTickCount;

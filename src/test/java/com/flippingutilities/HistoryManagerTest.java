@@ -30,6 +30,7 @@ package com.flippingutilities;
 import com.flippingutilities.model.Flip;
 import com.flippingutilities.model.HistoryManager;
 import com.flippingutilities.model.OfferEvent;
+import com.flippingutilities.utilities.ListUtils;
 import net.runelite.api.GrandExchangeOfferState;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -213,7 +215,7 @@ public class HistoryManagerTest
 		flips.add(new Flip(1, 2, 8, baseTime.minus(5, ChronoUnit.MINUTES), false, false));
 
 
-		List<Flip> calculatedFlips = historyManager.createFlips(standardizedOffers);
+		List<Flip> calculatedFlips = HistoryManager.createFlips(standardizedOffers);
 
 		assertEquals(flips, calculatedFlips);
 	}
@@ -249,15 +251,23 @@ public class HistoryManagerTest
 
 		flips.add(new Flip(2, 1, 1, baseTime.minus(10, ChronoUnit.MINUTES), true, false));
 		flips.add(new Flip(2, 1, 1, baseTime.minus(6, ChronoUnit.MINUTES), true, false));
+        List<Flip> expectedFlips = HistoryManager.pairMarginChecks(buyMarginChecks, sellMarginChecks, remainder);
 
+        List<Map.Entry<Flip, Flip>> flipPairs = ListUtils.zip(flips, expectedFlips);
+        flipPairs.forEach((Map.Entry<Flip, Flip> flipPair) ->
+                assertEquals(flipPair.getKey(), flipPair.getValue())
+        );
 
-		assertEquals(flips, historyManager.pairMarginChecks(buyMarginChecks, sellMarginChecks, remainder));
+        expectedRemainder.add(Utils.offer(true, 1, 3, baseTime.minus(8, ChronoUnit.MINUTES), 1, GrandExchangeOfferState.BOUGHT, 1, 1, 1));
+        expectedRemainder.add(Utils.offer(false, 1, 1, baseTime.minus(5, ChronoUnit.MINUTES), 1, GrandExchangeOfferState.SOLD, 1, 1, 1));
 
-		//add both the half margin checks that should be unpaired
-		expectedRemainder.add(Utils.offer(true, 1, 3, baseTime.minus(8, ChronoUnit.MINUTES), 1, GrandExchangeOfferState.BOUGHT, 1, 1, 1));
-		expectedRemainder.add(Utils.offer(false, 1, 1, baseTime.minus(5, ChronoUnit.MINUTES), 1, GrandExchangeOfferState.SOLD, 1, 1, 1));
+        List<Map.Entry<OfferEvent, OfferEvent>> remainderPairs = ListUtils.zip(remainder, expectedRemainder);
+        remainderPairs.forEach((Map.Entry<OfferEvent, OfferEvent> offerPair) -> {
+            OfferEvent a = offerPair.getKey();
+            OfferEvent b = offerPair.getValue();
 
-		assertEquals(expectedRemainder, remainder);
+            assert(a.isDuplicate(b));
+        });
 	}
 
 	//this test checks that flips are created correctly when there are not only uneven margin checks

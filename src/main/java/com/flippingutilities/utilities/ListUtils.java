@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ListUtils {
@@ -52,5 +53,20 @@ public class ListUtils {
             m.put(pair.getKey(), pair.getValue());
         });
         return m;
+    }
+
+    /**
+     *
+     * @param as    list 1 for zipping
+     * @param bs    list 2 for zipping
+     * @return    a list of `Map.Entry<A, B>[n]` where n is min(len(as), len(bs))
+     * @param <A>
+     * @param <B>
+     */
+    public static <A, B> List<Map.Entry<A, B>> zip(List<A> as, List<B> bs) {
+        // TODO: would it be more useful to zip nulls in to the end of the longer list?
+        return IntStream.range(0, Math.min(as.size(), bs.size()))
+                .mapToObj(i -> Map.entry(as.get(i), bs.get(i)))
+                .collect(Collectors.toList());
     }
 }
