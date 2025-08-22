@@ -1,6 +1,6 @@
 package com.flippingutilities.ui.uiutilities;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class CustomColors {
     public static final Color OUTDATED_COLOR = new Color(250, 74, 75);

@@ -1,0 +1,85 @@
+
+
+So the idea is basically we keep track of all inventory changes, including pouches and such, so whenever one of the things below
+happens we have a record of it.
+
+
+things to track for each item change:
+// class InventoryChange
+// item id (indexed), qty, type: enum{pickup,trade,used,dropped}, bank io: bool, GE io: bool (indexed), geValueAtChange, haValueAtChange, timestamp, sessionID (indexed), invChangeID: pkey
+
+
+// class storing information about a change in the inventory
+// qty: quantity gained (positive) or lost (negative), with |qty|>1 meaning stackable
+// type: pickup (item was picked up from the ground or given the item by an npc), trade (traded from GE or other player), used (item was a consumable and got used), dropped (item was dropped on the ground)
+// time and sequence tracking (invChangeID), as well as session sequence tracking (sessionID)
+// persisted in db
+
+
+
+Then, when we have that we can keep a record of the change in approximate account value. If theres a way to scan the whole bank we could do that as well,
+otherwise
+
+
+
+
+
+
+
+
+
+
+
+
+/**   * Open herb sack   */
+public static final int SLAYER_HERB_SACK_OPEN = 24478;
+/**   * Spice rack   */
+public static final int POH_KITCHEN_RACK_1 = 24479;
+/**   * Open coal bag   */
+public static final int COAL_BAG_OPEN = 24480;
+/**   * Open gem bag   */
+public static final int GEM_BAG_OPEN = 24481;
+/**   * Open seed box   */
+public static final int SEED_BOX_OPEN = 24482;
+/**   * Looting bag   */
+public static final int LOOTING_BAG_OPEN = 22586;
+
+/**
+Fish barrel
+*/
+public static final int FISH_BARREL_CLOSED = 25582;
+
+/**
+ * Open fish barrel
+*/
+public static final int FISH_BARREL_OPEN = 25584;
+
+/**
+* Fish sack barrel
+*/
+public static final int FISH_SACK_BARREL_CLOSED = 25585;
+
+/**
+* Open fish sack barrel
+*/
+public static final int FISH_SACK_BARREL_OPEN = 25587;
+
+public static final int LOOTING_BAG_OPEN = 22587; // note/cert
+
+
+// from ClueScrollPlugin
+// todo switch to new varbits api
+private static final int[] RUNEPOUCH_AMOUNT_VARBITS = {
+
+	VarbitID.RUNE_POUCH_QUANTITY_1,
+	VarbitID.RUNE_POUCH_QUANTITY_2,
+	VarbitID.RUNE_POUCH_QUANTITY_3,
+	VarbitID.RUNE_POUCH_QUANTITY_4
+};
+private static final int[] RUNEPOUCH_RUNE_VARBITS = {
+	// 29, 1622, 1623, 14285
+	VarbitID.RUNE_POUCH_TYPE_1,
+	VarbitID.RUNE_POUCH_TYPE_2,
+	VarbitID.RUNE_POUCH_TYPE_3,
+	VarbitID.RUNE_POUCH_TYPE_4
+};

@@ -158,7 +158,7 @@ public class TradePersister
 		}
 	}
 
-	private AccountData loadFromFile(File f) throws IOException
+	public AccountData loadFromFile(File f) throws IOException
 	{
 		String accountDataJson = new String(Files.readAllBytes(f.toPath()));
 		return gson.fromJson(accountDataJson, AccountData.class);
@@ -197,16 +197,16 @@ public class TradePersister
 	/**
 	 * stores trades for an account in {user's home directory}/.runelite/flipping/{account's display name}.json
 	 *
-	 * @param displayName display name of the account the data is associated with
-	 * @param data        the trades and last offers of that account
+	 * @param fileName the filename (generally the display name of the account the data is associated with)
+	 * @param data        the data to write to file (the trades and last offers of that account)
 	 * @throws IOException
 	 */
-	public void writeToFile(String displayName, Object data) throws IOException
+	public void writeToFile(String fileName, Object data) throws IOException
 	{
-		log.info("Writing to file for {}", displayName);
-		File accountFile = new File(PARENT_DIRECTORY, displayName + ".json");
+		log.info("Writing to file in {}.json.", fileName);
+		File file = new File(PARENT_DIRECTORY, fileName + ".json");
 		final String json = gson.toJson(data);
-		Files.write(accountFile.toPath(), json.getBytes());
+		Files.write(file.toPath(), json.getBytes());
 	}
 
 	public static long lastModified(String fileName)

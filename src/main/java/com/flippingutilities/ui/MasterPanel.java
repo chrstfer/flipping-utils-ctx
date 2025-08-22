@@ -35,6 +35,7 @@ import com.flippingutilities.ui.uiutilities.CustomColors;
 import com.flippingutilities.ui.uiutilities.FastTabGroup;
 import com.flippingutilities.ui.uiutilities.Icons;
 import com.flippingutilities.ui.uiutilities.UIUtilities;
+import com.flippingutilities.ui.wealthtracking.WealthPanel;
 import net.runelite.client.ui.components.TitleCaseListCellRenderer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -69,11 +70,13 @@ public class MasterPanel extends PluginPanel
 	 *
 	 * @param flippingPanel FlippingPanel represents the main tool of the plugin.
 	 * @param statPanel     StatPanel represents useful performance statistics to the user.
+	 * @param wealthPanel
 	 */
 	public MasterPanel(FlippingPlugin plugin,
 					   FlippingPanel flippingPanel,
 					   StatsPanel statPanel,
 					   SlotsPanel slotsPanel,
+					   WealthPanel wealthPanel,
 					   LoginPanel loginPanel)
 	{
 		super(false);
@@ -94,7 +97,7 @@ public class MasterPanel extends PluginPanel
 		loginModal.pack();
 
 		accountSelector = accountSelector();
-		tabGroup = tabSelector(mainDisplay, flippingPanel, statPanel, slotsPanel);
+		tabGroup = tabSelector(mainDisplay, flippingPanel, statPanel, slotsPanel, wealthPanel);
 
 		JPanel header = createHeader(accountSelector, tabGroup, loginModal);
 		header.setBorder(BorderFactory.createCompoundBorder(
@@ -223,20 +226,23 @@ public class MasterPanel extends PluginPanel
 	 * Adds the tabs for the flipping panel and stats panel onto the main display panel. These tabs can then
 	 * be clicked to view the flipping/stats panel
 	 *
-	 * @param mainDisplay   the panel on which the tabs will be put and on which either the flipping or stats panel will be
-	 *                      rendered
+	 * @param mainDisplay the panel on which the tabs will be put and on which either the flipping or stats panel will be
+	 *                    rendered
+	 * @param wealthPanel
 	 * @return
 	 */
-	private FastTabGroup tabSelector(JPanel mainDisplay, JPanel flippingPanel, JPanel statPanel, JPanel slotsPanel)
+	private FastTabGroup tabSelector(JPanel mainDisplay, JPanel flippingPanel, JPanel statPanel, JPanel slotsPanel, WealthPanel wealthPanel)
 	{
 		FastTabGroup tabGroup = new FastTabGroup(mainDisplay);
 		MaterialTab flippingTab = new MaterialTab("flipping", tabGroup, flippingPanel);
 		MaterialTab statisticsTab = new MaterialTab("stats", tabGroup, statPanel);
 		MaterialTab slotsTab = new MaterialTab("slots", tabGroup, slotsPanel);
+		MaterialTab wealthTab = new MaterialTab("wealth", tabGroup, wealthPanel);
 
 		tabGroup.addTab(slotsTab);
 		tabGroup.addTab(flippingTab);
 		tabGroup.addTab(statisticsTab);
+		tabGroup.add(wealthTab);
 
 		tabGroup.select(flippingTab);
 		return tabGroup;

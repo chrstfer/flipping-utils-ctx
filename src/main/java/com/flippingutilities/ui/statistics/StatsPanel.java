@@ -46,9 +46,21 @@ import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.ui.components.materialtabs.MaterialTab;
 import net.runelite.client.util.QuantityFormatter;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JLabel;
+import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
+import javax.swing.SwingConstants;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
+import javax.swing.JFileChooser;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.StyleContext;
+import javax.swing.SwingUtilities;
+
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -69,13 +81,13 @@ public class StatsPanel extends JPanel
 	private static final String[] TIME_INTERVAL_STRINGS = {"-1h (Past Hour)", "-4h (Past 4 Hours)", "-12h (Past 12 Hours)", "-1d (Past Day)", "-1w (Past Week)", "-1m (Past Month)", "Session", "All"};
 	private static final Dimension ICON_SIZE = new Dimension(16, 16);
 
-	private FlippingPlugin plugin;
+	private final FlippingPlugin plugin;
 
 	//Holds the sub info labels.
 	private JPanel subInfoPanel;
 
 	//Combo box that selects the time interval that startOfInterval contains.
-	private JComboBox<String> timeIntervalDropdown = this.createTimeIntervalDropdown();
+	private final JComboBox<String> timeIntervalDropdown = this.createTimeIntervalDropdown();
 
 	//Represents the total profit made in the selected time interval.
 	private JLabel totalProfitVal = new JLabel();
