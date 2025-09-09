@@ -40,6 +40,7 @@ import net.runelite.api.events.GrandExchangeOfferChanged;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -224,26 +225,22 @@ public class OfferEvent
 		);
 	}
 
-	public boolean equals(Object other)
-	{
-		if (other == this)
-		{
-			return true;
-		}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		OfferEvent that = (OfferEvent) o;
+		return buy == that.buy &&
+				itemId == that.itemId &&
+				currentQuantityInTrade == that.currentQuantityInTrade &&
+				price == that.price &&
+				slot == that.slot &&
+				state == that.state;
+	}
 
-		if (!(other instanceof OfferEvent))
-		{
-			return false;
-		}
-
-		OfferEvent otherOffer = (OfferEvent) other;
-
-		return
-			isDuplicate(otherOffer)
-			&& uuid.equals(otherOffer.uuid)
-			&& tickArrivedAt == otherOffer.tickArrivedAt
-			&& ticksSinceFirstOffer == otherOffer.ticksSinceFirstOffer
-			&& time.equals(otherOffer.time);
+	@Override
+	public int hashCode() {
+		return Objects.hash(buy, itemId, currentQuantityInTrade, price, slot, state);
 	}
 
     /**
@@ -330,4 +327,3 @@ public class OfferEvent
 				0);
 	}
 }
-

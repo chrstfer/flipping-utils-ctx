@@ -1,0 +1,72 @@
+* Proposed Class Structure for Wealth Tracking
+
+This document outlines the proposed class structure for the new wealth tracking feature. The design separates data models, business logic (services), and UI components, and is built to be extensible for future requirements like categorizing wealth changes.
+
+** PWD for this file is project root. All paths below are relative to =src/main/java/com/flippingutilities/=.
+
+*** Backend & Core Logic: =wealthtracking/=
+This package will contain all the non-UI logic for the wealth tracking feature.
+
+**** =WealthTracker.java= (Controller/Service)
+- *Purpose*: The central nervous system of the feature.
+- *Responsibilities*:
+  - Initializes and manages all other backend components.
+  - Listens for relevant RuneLite events (e.g., =ItemContainerChanged=, =GameStateChanged=).
+  - Triggers wealth snapshots periodically or on specific events.
+  - Serves as the primary data provider for the UI (=ui.wealthtracking.*=).
+  - Manages the persistence (loading/saving) of the =AccountWealth= object.
+
+**** =model/=
+This subpackage will contain the Plain Old Java Objects (POJOs) that model the feature's data.
+
+***** =AccountWealth.java= (Primary Data Model)
+- *Purpose*: Represents the complete wealth history for the player.
+- *Responsibilities*:
+  - Holds a time-ordered list of wealth snapshots: =List<WealthSnapshot>=.
+  - Can be serialized to/from JSON or another format for persistence.
+  - Provides methods to query the wealth history (e.g., get wealth at a certain time, get wealth changes over a period).
+
+***** =WealthSnapshot.java= (Data Point Model)
+- *Purpose*: Represents the state of the player's wealth at a single point in time.
+- *Responsibilities*:
+  - Contains a =long timestamp=.
+  - Contains a =Map<WTValueType, Long>= to store the calculated value for each category (Bank, Inventory, etc.).
+
+***** =WealthChangeEvent.java= (Event Model - for future extension)
+- *Purpose*: Abstract base class/interface for events that cause a change in wealth. This allows for future expansion to track the *source* of wealth changes.
+- *Subtypes could include*:
+  - =LootReceivedEvent= (from PVM/PVP)
+  - =ItemCraftedEvent=
+  - =GeTradeEvent=
+  - =ManualAdjustmentEvent=
+
+**** =util/=
+This subpackage will contain utility classes with specific, reusable responsibilities.
+
+***** =ItemPricer.java= (Utility)
+- *Purpose*: To abstract the logic of finding the price of an item.
+- *Responsibilities*:
+  - Interfaces with RuneLite's =ItemManager= and potentially the existing plugin's GE price data.
+  - Provides a single method, e.g., =long getPrice(int itemId)=.
+
+***** =ContainerScanner.java= (Utility)
+- *Purpose*: To calculate the total value of an item container.
+- *Responsibilities*:
+  - Takes an =ItemContainer= (from RuneLite API) as input.
+  - Uses =ItemPricer= to value each item.
+  - Returns the total value of the container.
+
+*** UI Components: =ui/wealthtracking/=
+This package contains the existing UI files, which will be refactored to work with the new backend structure.
+
+**** =WealthPanel.java= (Exists)
+- *New Role*: The main view container. It will be refactored to remove any logic and instead get all its data from the =WealthTracker=. It will construct its sub-panels and pass them the necessary data.
+
+**** =WTValuePanel.java= (Exists)
+- *New Role*: A dumb component that displays a single value (e.g., "Bank: 1.2M gp"). It receives its data from the parent =WealthPanel=.
+
+**** =WTChartPanel.java= (Exists)
+- *New Role*: A component that receives a =List<WealthSnapshot>= and renders it as a chart.
+
+**** =SessionProfitOverlay.java= (Exists)
+- *New Role*: An overlay that gets session profit data from the =WealthTracker= and displays it.

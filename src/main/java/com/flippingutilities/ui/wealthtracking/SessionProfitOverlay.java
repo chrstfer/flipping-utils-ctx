@@ -1,22 +1,43 @@
 package com.flippingutilities.ui.wealthtracking;
 
+import com.flippingutilities.wealthtracking.WealthTracker;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import javax.inject.Inject;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.LineComponent;
+import net.runelite.client.ui.overlay.components.PanelComponent;
 
-import java.awt.Color;
+/**
+ * An overlay to show the profit/loss for the current session.
+ * This is a placeholder and will need to be properly implemented to calculate
+ * session profit based on the snapshots from the WealthTracker.
+ */
+public class SessionProfitOverlay extends Overlay {
+    private final WealthTracker wealthTracker;
+    private final PanelComponent panelComponent = new PanelComponent();
 
-import com.flippingutilities.ui.uiutilities.CustomColors;
-import com.flippingutilities.ui.uiutilities.CustomFonts;
-import com.flippingutilities.ui.uiutilities.UIUtilities;
+    @Inject
+    private SessionProfitOverlay(WealthTracker wealthTracker) {
+        this.wealthTracker = wealthTracker;
+        setPosition(OverlayPosition.TOP_LEFT);
+    }
 
+    @Override
+    public Dimension render(Graphics2D graphics) {
+        panelComponent.getChildren().clear();
 
-// tracks profit since login, or last overlay reset
-public class SessionProfitOverlay
-{
-	private static final int TEXT_Y_OFFSET = 17;
-	private static final String PROFIT_LOSS_TIME_FORMAT = "%02d:%02d:%02d";
-	private static final String PROFIT_LOSS_TIME_NO_HOURS_FORMAT = "%02d:%02d";
-	private static final int HORIZONTAL_PADDING = 10;
-	private static final int BANK_CLOSE_DELAY = 1200;
-	private static final Color LEDGER_BACKGROUND_COLOR = new Color(27, 27, 27, 202);
+        //TODO: Implement logic to calculate session profit.
+        //This would involve getting the first and last snapshot for the current session
+        //from the WealthTracker and calculating the difference.
+        long sessionProfit = 0; //Placeholder value
 
+        panelComponent.getChildren().add(LineComponent.builder()
+            .left("Session Profit:")
+            .right(sessionProfit + " gp")
+            .build());
 
+        return panelComponent.render(graphics);
+    }
 }

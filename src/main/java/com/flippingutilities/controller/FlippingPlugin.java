@@ -152,7 +152,8 @@ public class FlippingPlugin extends Plugin
 	@Getter	private SlotsPanel slotsPanel;
 	@Getter	private MasterPanel masterPanel;
 	@Getter	private GeHistoryTabPanel geHistoryTabPanel;
-	@Getter private WealthPanel wealthPanel;
+	@Inject @Getter private WealthPanel wealthPanel;
+	@Inject private WealthTracker wealthTracker;
 	private SettingsPanel settingsPanel;
 	private LoginPanel loginPanel;
 	//this flag is to know that when we see the login screen an account has actually logged out and its not just that the
@@ -204,9 +205,7 @@ public class FlippingPlugin extends Plugin
 		apiRequestHandler = new ApiRequestHandler(this);
 		slotStateDrawer = new SlotStateDrawer(this, this.tooltipManager, client);
 		eventBus.register(slotStateDrawer);
-
-		WealthTracker wealthTracker = new WealthTracker();
-		wealthPanel = wealthTracker.getWealthPanel();
+		eventBus.register(wealthTracker);
 
 		loginPanel = new LoginPanel(this);
 		flippingPanel = new FlippingPanel(this);
@@ -255,6 +254,7 @@ public class FlippingPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
+		eventBus.unregister(wealthTracker);
 		log.info("shutdown running!");
 		if (generalRepeatingTasks != null)
 		{

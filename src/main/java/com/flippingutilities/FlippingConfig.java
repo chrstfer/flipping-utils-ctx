@@ -28,7 +28,7 @@ package com.flippingutilities;
 
 import com.flippingutilities.controller.FlippingPlugin;
 
-import com.flippingutilities.wealthtracking.WealthTrackingPriceType; // GE or HA
+//import com.flippingutilities.wealthtracking.WealthTrackingPriceType; // GE or HA
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -101,11 +101,11 @@ public interface FlippingConfig extends Config
 	@ConfigItem(keyName = "wealthTrackingEnabled", name = "Enable Wealth Tracking", description = "Enable the wealth tracker." )
 	default boolean wealthTrackingEnabled() { return true; }
 
-	@ConfigItem(keyName = "itemPriceTypeKey", name = "Prices", description = "Configures the price type.")
-	default WealthTrackingPriceType priceType()
-	{
-		return WealthTrackingPriceType.GRAND_EXCHANGE;
-	}
+	//@ConfigItem(keyName = "itemPriceTypeKey", name = "Prices", description = "Configures the price type.")
+	//default WealthTrackingPriceType priceType()
+	//{
+	//	return WealthTrackingPriceType.GRAND_EXCHANGE;
+	//}
 
 	@ConfigItem(keyName = "plOverlay", name = "PL Overlay", description = "")
 	default boolean plOverlay() { return true; }

@@ -1,79 +1,92 @@
 package com.flippingutilities.wealthtracking;
 
-import com.flippingutilities.FlippingConfig;
-//import com.flippingutilities.db.WealthDB;
-
-import com.flippingutilities.controller.FlippingPlugin;
-import com.flippingutilities.ui.wealthtracking.SessionProfitOverlay;
 import com.flippingutilities.ui.wealthtracking.WealthPanel;
-import static com.flippingutilities.wealthtracking.WealthTrackingIDs.*;
-
-import com.google.gson.Gson;
-import com.google.inject.Inject;
-
-import java.awt.BorderLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import com.flippingutilities.wealthtracking.model.AccountWealth;
+import com.flippingutilities.wealthtracking.model.WTValueType;
+import com.flippingutilities.wealthtracking.model.WealthSnapshot;
+import com.flippingutilities.wealthtracking.util.ContainerScanner;
+import com.flippingutilities.wealthtracking.util.ItemPricer;
+import java.time.Instant;
+import java.util.EnumMap;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 
-
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.events.RuneScapeProfileChanged;
-
-
-import net.runelite.client.util.HotkeyListener;
-import net.runelite.client.input.KeyListener;
-import net.runelite.client.input.KeyManager;
-
-import net.runelite.client.ui.overlay.OverlayManager;
-
+/**
+ * The central nervous system of the wealth tracking feature. It listens to game events,
+ * orchestrates the scanning of item containers, creates wealth snapshots, and holds the
+ * main AccountWealth object. It is the single source of truth for the UI.
+ */
 @Slf4j
-public class WealthTracker
-{
-	// inventory total
-	// session profit
-	// wealth total
-	// time-based profit (session/day/week/month/qtr/all time)
-	// graphing all these (combobox selector)
-	// export data
+@Singleton
+public class WealthTracker {
+    private final ItemManager itemManager;
+    private final Client client;
+    private final WealthPanel wealthPanel;
+    private final ClientThread clientThread;
 
-	private OverlayManager overlayManager;
-	private SessionProfitOverlay sessionProfitOverlay;
+    @Getter
+    private AccountWealth accountWealth;
+    private ContainerScanner containerScanner;
 
-	@Inject	private Client client;
-	@Inject private FlippingPlugin plugin;
-	@Inject private FlippingConfig flippingConfig;
-	@Inject private ClientThread clientThread;
+    @Inject
+    private WealthTracker(Client client, ItemManager itemManager, WealthPanel wealthPanel, ClientThread clientThread) {
+        this.client = client;
+        this.itemManager = itemManager;
+        this.wealthPanel = wealthPanel;
+        this.clientThread = clientThread;
+        init();
+    }
 
-	@Inject private Gson gson;
-	@Inject private EventBus eventBus;
-	@Inject	private KeyManager keyManager;
-	@Inject	private ItemManager itemManager;
+    /**
+     * Initializes the WealthTracker.
+     */
+    private void init() {
+        ItemPricer itemPricer = new ItemPricer(itemManager);
+        this.containerScanner = new ContainerScanner(itemPricer);
+        this.accountWealth = new AccountWealth(); //In reality, we'd load this from a file.
+        log.info("Wealth Tracker initialized");
+    }
 
-	@Getter final WealthPanel wealthPanel;
+    @Subscribe
+    public void on(ItemContainerChanged event) {
+        if (event.getContainerId() == InventoryID.BANK.getId() || event.getContainerId() == InventoryID.INVENTORY.getId()) {
+            log.debug("Tracked container changed: {}. Taking snapshot.", event.getContainerId());
+            takeSnapshot("Container changed");
+        }
+    }
 
-	public WealthTracker()
-	{
-		this.wealthPanel = createWealthPanel();
-	}
+    public void takeSnapshot(String reason) {
+        log.info("Taking wealth snapshot, reason: {}", reason);
 
-	private WealthPanel createWealthPanel()
-	{
-		WealthPanel wp;
-		try
-		{
-			wp = new WealthPanel();
-		} catch(Exception e) {
-			log.info("Error creating WealthPanel: {}", e.toString());
-			throw e;
-		}
+        ItemContainer bank = client.getItemContainer(InventoryID.BANK);
+        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
 
-		return wp;
-	}
+        long bankValue = containerScanner.calculateContainerValue(bank);
+        long inventoryValue = containerScanner.calculateContainerValue(inventory);
+        long overallValue = bankValue + inventoryValue;
 
+        Map<WTValueType, Long> values = new EnumMap<>(WTValueType.class);
+        values.put(WTValueType.BANK, bankValue);
+        values.put(WTValueType.INVENTORY, inventoryValue);
+        values.put(WTValueType.OVERALL, overallValue);
+
+        WealthSnapshot snapshot = new WealthSnapshot();
+        snapshot.setTimestamp(Instant.now());
+        snapshot.setWealthValues(values);
+
+        accountWealth.addSnapshot(snapshot);
+
+        //Notify the UI on the EDT
+        clientThread.invokeLater(() -> wealthPanel.update());
+    }
 }

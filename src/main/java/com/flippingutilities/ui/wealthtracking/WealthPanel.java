@@ -1,113 +1,55 @@
 package com.flippingutilities.ui.wealthtracking;
 
 import com.flippingutilities.controller.FlippingPlugin;
-import com.flippingutilities.utilities.Jwt;
-import com.flippingutilities.wealthtracking.WTValueType;
-import com.google.inject.Inject;
+import com.flippingutilities.wealthtracking.WealthTracker;
+import com.flippingutilities.wealthtracking.model.WTValueType;
+import com.flippingutilities.wealthtracking.model.WealthSnapshot;
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import javax.swing.BoxLayout;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
 import net.runelite.client.ui.ColorScheme;
 
-public class WealthPanel extends JPanel
-{
-	private static final String VALUES_PANEL = "VALUES_PANEL";
-	//private static final String WELCOME_PANEL = "WELCOME_PANEL";
+/**
+ * The main panel for the wealth tracking feature. It serves as the container for all
+ * other wealth tracking UI components like value panels and charts. It gets its data
+ * from the WealthTracker.
+ */
+@Singleton
+public class WealthPanel extends JPanel {
 
-	@Inject private FlippingPlugin plugin;
+    private final WealthTracker wealthTracker;
+    private final FlippingPlugin plugin;
+    private final JLabel placeholderLabel; // A temporary label to show something is happening
 
-	public final CardLayout valuesCardLayout = new CardLayout();
-	public final CardLayout chartCardLayout = new CardLayout();
+    @Inject
+    public WealthPanel(FlippingPlugin plugin, WealthTracker wealthTracker) {
+        this.plugin = plugin;
+        this.wealthTracker = wealthTracker;
 
-	//private final JPanel WTHeaderPanel = new JPanel();
+        setBackground(ColorScheme.DARK_GRAY_COLOR);
+        setLayout(new BorderLayout());
 
-	private final JPanel wtValuesPanel = new JPanel();
-	private final JPanel wtValuesContainer = new JPanel(valuesCardLayout);
+        placeholderLabel = new JLabel("Wealth Tracker UI will be here.");
+        placeholderLabel.setHorizontalAlignment(JLabel.CENTER);
+        add(placeholderLabel, BorderLayout.CENTER);
 
-	private final JPanel wtPinnedChartPanel = new JPanel();
-	private final JPanel wtPinnedChartContainer = new JPanel(chartCardLayout);
+        // In the future, this is where we would create and add:
+        // - A header panel for summary stats (e.g., ROI)
+        // - The main scrollable panel of WTValuePanels
+        // - A footer panel for the chart (WTChartPanel)
+    }
 
-	private final JPanel wtHeaderPanel;
-	private final JPanel wtFooterPanel;
-
-	//contains the value panels
-	private ArrayList<WTValuePanel> activeValueBoxes = new ArrayList<>();
-
-	public WealthPanel()
-	{
-		super(false);
-
-		setLayout(new BorderLayout());
-		setBackground(ColorScheme.DARK_GRAY_COLOR);
-
-
-		// set up the scrollable values panel
-		ArrayList<WTValuePanel> valuePanels = new ArrayList<>();
-		for(WTValueType vt : WTValueType.values())
-		{
-			WTValuePanel valuePanel = new WTValuePanel(vt);
-			valuePanels.add(valuePanel);
-			wtValuesPanel.add(valuePanel);
-		}
-		wtValuesPanel.setLayout(new BoxLayout(wtValuesPanel, BoxLayout.Y_AXIS));
-		wtValuesPanel.setBorder(new EmptyBorder(0, 8, 0, 7));
-		wtValuesPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		JPanel wrapper = new JPanel(new BorderLayout());
-		wrapper.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		wrapper.add(wtValuesPanel, BorderLayout.NORTH);
-		JScrollPane scrollPane = new JScrollPane(wrapper);
-		scrollPane.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(2, 0));
-		wtValuesContainer.add(scrollPane, VALUES_PANEL);
-
-		// setup pinned chart
-		//wtPinnedChartPanel
-
-		// setup header and footer
-		wtHeaderPanel = new JPanel(new BorderLayout());
-		wtHeaderPanel.setBorder(new EmptyBorder(0,0,2,0));
-		// todo populate
-
-
-		wtFooterPanel  = new JPanel(new BorderLayout());
-		wtFooterPanel.setBorder(new EmptyBorder(2,0,0,0 ));
-		// todo populate: chart, chart period menu, chart
-		wtFooterPanel.add(wtPinnedChartContainer, BorderLayout.CENTER);
-
-		//To switch between greeting and items panels
-		valuesCardLayout.show(wtValuesContainer, VALUES_PANEL);
-		add(wtHeaderPanel, BorderLayout.NORTH);
-		add(wtValuesContainer, BorderLayout.CENTER);
-		add(wtFooterPanel, BorderLayout.SOUTH);
-
-		setBorder(new EmptyBorder(5,0,0,0));
-	}
-
-	/**
-	 * Creates and renders the panel:
-	 * [[top: current overall, session ROI, weekly ROI]
-	 *  [scroll panel: , inventory, bank]
-	 *  [chart panel: chart type combobox, chart]]
-	 *
-	 */
-//	private ArrayList<WTValuePanel> getActiveSubPanelBoxes()
-//	{
-//		SwingUtilities.invokeLater(()->
-//		{
-//			activeSubPanelBoxes.forEach(p -> p.popup.setVisible(false));
-//			activeSubPanelBoxes.clear();
-//			wtValuePanel.removeAll();
-//
-//			// inventory
-//			// account value
-//			//
-//		});
-//	}
-
+    /**
+     * Called by the WealthTracker when new data is available. This method will be responsible
+     * for repainting the panel and updating its child components with the new information.
+     */
+    public void update() {
+        WealthSnapshot latestSnapshot = wealthTracker.getAccountWealth().getLatestSnapshot();
+        if (latestSnapshot != null) {
+            long overallValue = latestSnapshot.getWealthValues().getOrDefault(WTValueType.OVERALL, 0L);
+            placeholderLabel.setText("Total Wealth: " + overallValue + " gp");
+        }
+    }
 }
