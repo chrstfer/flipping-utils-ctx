@@ -1,12 +1,12 @@
-package com.flippingutilities.wealthtracking;
+package com.flippingutilities.wealthtracking.model;
 
 
-import com.flippingutilities.db.TradePersister;
 import com.flippingutilities.model.AccountData;
 import com.flippingutilities.model.FlippingItem;
 import com.flippingutilities.model.OfferEvent;
 import com.flippingutilities.ui.uiutilities.TimeFormatters;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,15 +15,18 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+
+// AccountData ->  List<FlippingItem> trades -<List>-> HistoryManager
+
+
 public class WealthHistoryManager
 {
 
 	private AccountData accountData;
-	private static final Gson gson = Gson;
+	@Inject	private Gson gson;
 
-	public WealthHistoryManager(Gson gson, AccountData accountData)
+	public WealthHistoryManager(AccountData accountData)
 	{
-		this.gson = gson;
 		this.accountData = accountData;
 	}
 

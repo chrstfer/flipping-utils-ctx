@@ -78,11 +78,9 @@ public class FlippingPanel extends JPanel
 	@Setter
 	private boolean itemHighlighted = false;
 
-	@Getter
-	private Paginator paginator;
+	@Getter	private Paginator paginator;
 
-	@Getter
-	private OfferEditorContainerPanel offerEditorContainerPanel;
+	@Getter	private OfferEditorContainerPanel offerEditorContainerPanel;
 	private IconTextField searchBar;
 
 	private boolean currentlySearching;

@@ -218,8 +218,6 @@ public class FlippingPlugin extends Plugin
 		masterPanel.addView(geHistoryTabPanel, "ge history");
 		navButton = NavigationButton.builder().tooltip("Flipping Utilities").icon(ImageUtil.loadImageResource(getClass(), "/graph_icon_green.png")).priority(3).panel(masterPanel).build();
 
-
-
 		clientToolbar.addNavigation(navButton);
 		keyManager.registerKeyListener(offerEditorKeyListener());
 		clientThread.invokeLater(() -> {

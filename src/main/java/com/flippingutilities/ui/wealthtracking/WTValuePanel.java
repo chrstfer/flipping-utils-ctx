@@ -41,42 +41,24 @@ public class WTValuePanel extends JPanel
 
 	@Inject	FlippingPlugin plugin;
 
-	@Getter
-	@Setter
-	private WTValueType valueType;
+	@Getter	@Setter	private WTValueType valueType;
 
 	// I think most of these with setters could be final
-	@Getter
-	@Setter
-	private JLabel valueTypeLabel = new JLabel();
-	@Getter
-	@Setter
-	private JLabel valueLabel = new JLabel();
+	@Getter	@Setter	private JLabel valueTypeLabel = new JLabel();
+	@Getter	@Setter	private JLabel valueLabel = new JLabel();
 
-	@Getter
-	final JLabel statisticsSectionLabel = new JLabel("Statistics");
-	@Getter
-	final JLabel sessionROILabel = new JLabel("Session ROI: ");
-	@Getter
-	@Setter
-	private JLabel sessionROIValueLabel = new JLabel();
+	@Getter	final JLabel statisticsSectionLabel = new JLabel("Statistics");
+	@Getter	final JLabel sessionROILabel = new JLabel("Session ROI: ");
+	@Getter	@Setter	private JLabel sessionROIValueLabel = new JLabel();
 
-	@Getter
-	final JLabel periodROILabel = new JLabel("Period ROI: "); // todo make this change when period selected
-	@Getter
-	@Setter
-	private JLabel periodROIValueLabel = new JLabel();
-	@Getter
-	final JComboBox<String> periodSelectionCombobox = new JComboBox<>();
+	@Getter	final JLabel periodROILabel = new JLabel("Period ROI: "); // todo make this change when period selected
+	@Getter	@Setter	private JLabel periodROIValueLabel = new JLabel();
+	@Getter	final JComboBox<String> periodSelectionCombobox = new JComboBox<>();
 
-	@Getter
-	final JLabel chartSectionLabel = new JLabel("Chart");
+	@Getter	final JLabel chartSectionLabel = new JLabel("Chart");
 
-	@Getter
-	final JLabel lastUpdatedLabel = new JLabel("Last Updated: ");
-	@Getter
-	@Setter
-	JLabel lastUpdatedValueLabel = new JLabel();
+	@Getter	final JLabel lastUpdatedLabel = new JLabel("Last Updated: ");
+	@Getter	@Setter	JLabel lastUpdatedValueLabel = new JLabel();
 
 	private final JPanel detailPanel;
 	@Getter @Setter private boolean detailVisible;
