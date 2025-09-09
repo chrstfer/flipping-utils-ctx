@@ -206,6 +206,7 @@ public class FlippingPlugin extends Plugin
 		slotStateDrawer = new SlotStateDrawer(this, this.tooltipManager, client);
 		eventBus.register(slotStateDrawer);
 		eventBus.register(wealthTracker);
+		eventBus.register(wealthPanel);
 
 		loginPanel = new LoginPanel(this);
 		flippingPanel = new FlippingPanel(this);
@@ -255,6 +256,7 @@ public class FlippingPlugin extends Plugin
 	protected void shutDown()
 	{
 		eventBus.unregister(wealthTracker);
+		eventBus.unregister(wealthPanel);
 		log.info("shutdown running!");
 		if (generalRepeatingTasks != null)
 		{

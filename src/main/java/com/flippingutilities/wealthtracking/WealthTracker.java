@@ -1,9 +1,9 @@
 package com.flippingutilities.wealthtracking;
 
-import com.flippingutilities.ui.wealthtracking.WealthPanel;
 import com.flippingutilities.wealthtracking.model.AccountWealth;
 import com.flippingutilities.wealthtracking.model.WTValueType;
 import com.flippingutilities.wealthtracking.model.WealthSnapshot;
+import com.flippingutilities.wealthtracking.model.WealthSnapshotEvent;
 import com.flippingutilities.wealthtracking.util.ContainerScanner;
 import com.flippingutilities.wealthtracking.util.ItemPricer;
 import java.time.Instant;
@@ -17,7 +17,7 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.client.callback.ClientThread;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 
@@ -31,29 +31,24 @@ import net.runelite.client.game.ItemManager;
 public class WealthTracker {
     private final ItemManager itemManager;
     private final Client client;
-    private final WealthPanel wealthPanel;
-    private final ClientThread clientThread;
+    private final EventBus eventBus;
 
     @Getter
     private AccountWealth accountWealth;
     private ContainerScanner containerScanner;
 
     @Inject
-    private WealthTracker(Client client, ItemManager itemManager, WealthPanel wealthPanel, ClientThread clientThread) {
+    private WealthTracker(Client client, ItemManager itemManager, EventBus eventBus) {
         this.client = client;
         this.itemManager = itemManager;
-        this.wealthPanel = wealthPanel;
-        this.clientThread = clientThread;
+        this.eventBus = eventBus;
         init();
     }
 
-    /**
-     * Initializes the WealthTracker.
-     */
     private void init() {
         ItemPricer itemPricer = new ItemPricer(itemManager);
         this.containerScanner = new ContainerScanner(itemPricer);
-        this.accountWealth = new AccountWealth(); //In reality, we'd load this from a file.
+        this.accountWealth = new AccountWealth();
         log.info("Wealth Tracker initialized");
     }
 
@@ -86,7 +81,6 @@ public class WealthTracker {
 
         accountWealth.addSnapshot(snapshot);
 
-        //Notify the UI on the EDT
-        clientThread.invokeLater(() -> wealthPanel.update());
+        eventBus.post(new WealthSnapshotEvent(snapshot));
     }
 }
