@@ -53,7 +53,7 @@ public class WealthTracker {
     }
 
     @Subscribe
-    public void on(ItemContainerChanged event) {
+    public void onItemContainerChanged(ItemContainerChanged event) {
         if (event.getContainerId() == InventoryID.BANK.getId() || event.getContainerId() == InventoryID.INVENTORY.getId()) {
             log.debug("Tracked container changed: {}. Taking snapshot.", event.getContainerId());
             takeSnapshot("Container changed");
