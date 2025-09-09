@@ -242,7 +242,7 @@ public class MasterPanel extends PluginPanel
 		tabGroup.addTab(slotsTab);
 		tabGroup.addTab(flippingTab);
 		tabGroup.addTab(statisticsTab);
-		tabGroup.add(wealthTab);
+		tabGroup.addTab(wealthTab);
 
 		tabGroup.select(flippingTab);
 		return tabGroup;
